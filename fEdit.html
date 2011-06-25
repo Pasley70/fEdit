@@ -1,0 +1,348 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="max-age=0">
+
+<title>FEdit</title>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.getUrlParam.js"></script>
+<script type="text/javascript" src="js/jquery.blockUI.js"></script>
+
+<!-- EditArea Example -->
+<script src="edit_area/edit_area_full.js" type="text/javascript"></script>
+
+<!-- Configuration -->
+<script src="js/fEdit_config.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+/* 
+ * Init Script
+ */
+var filename = $(document).getUrlParam("filename");
+
+var deffilename = filepath.substring(filepath.lastIndexOf('/') + 1);
+
+filepath = filepath.substr(0,filepath.length-deffilename.length);
+
+var initarea = false;
+var header;
+var p_noscript="true";
+var emen = new Array;
+var act = "";
+/* 
+ * Map for Converting UTF-8 to ISO + HTML-Entities
+ */
+var UTFChar	= new Array("Â","â","´","Æ","æ","À","à","ℵ","Α","α","∧","∠","'","Å","å","≈","Ã","ã","Ä","ä","„","Β","β","¦","•","∩","Ç","ç","¸","¢","Χ","χ","ˆ","♣","≅","©","↵","∪","¤","‡","†","⇓","↓","°","Δ","δ","♦","÷","É","é","Ê","ê","È","è","∅"," "," ","Ε","ε","≡","Η","η","Ð","ð","Ë","ë","€","∃","ƒ","∀","½","¼","¾","⁄","Γ","γ","≥","⇔","↔","♥","…","Í","í","Î","î","¡","Ì","ì","ℑ","∞","∫","Ι","ι","¿","∈","Ï","ï","Κ","κ","Λ","λ","〈","«","⇐","←","⌈","“","≤","⌊","∗","◊","‎","‹","‘","¯","—","µ","·","−","Μ","μ","∇"," ","–","≠","∋","¬","∉","⊄","Ñ","ñ","Ν","ν","Ó","ó","Ô","ô","Œ","œ","Ò","ò","‾","Ω","ω","Ο","ο","⊕","∨","ª","º","Ø","ø","Õ","õ","⊗","Ö","ö","¶","∂","‰","⊥","Φ","φ","Π","π","ϖ","±","£","″","′","∏","∝","Ψ","ψ","√","〉","»","⇒","→","⌉","”","ℜ","®","⌋","Ρ","ρ","‏","›","’","‚","Š","š","⋅","§","­","Σ","σ","ς","∼","♠","⊂","⊆","∑","⊃","¹","²","³","⊇","ß","Τ","τ","∴","Θ","θ","ϑ"," ","Þ","þ","˜","×","™","Ú","ú","⇑","↑","Û","û","Ù","ù","¨","ϒ","Υ","υ","Ü","ü","℘","Ξ","ξ","Ý","ý","¥","Ÿ","ÿ","Ζ","ζ");
+var HTMLent = new Array("&Acirc;","&acirc;","&acute;","&AElig;","&aelig;","&Agrave;","&agrave;","&alefsym;","&Alpha;","&alpha;","&and;","&ang;","&apos;","&Aring;","&aring;","&asymp;","&Atilde;","&atilde;","&Auml;","&auml;","&bdquo;","&Beta;","&beta;","&brvbar;","&bull;","&cap;","&Ccedil;","&ccedil;","&cedil;","&cent;","&Chi;","&chi;","&circ;","&clubs;","&cong;","&copy;","&crarr;","&cup;","&curren;","&Dagger;","&dagger;","&dArr;","&darr;","&deg;","&Delta;","&delta;","&diams;","&divide;","&Eacute;","&eacute;","&Ecirc;","&ecirc;","&Egrave;","&egrave;","&empty;","&emsp;","&ensp;","&Epsilon;","&epsilon;","&equiv;","&Eta;","&eta;","&ETH;","&eth;","&Euml;","&euml;","&euro;","&exist;","&fnof;","&forall;","&frac12;","&frac14;","&frac34;","&frasl;","&Gamma;","&gamma;","&ge;","&hArr;","&harr;","&hearts;","&hellip;","&Iacute;","&iacute;","&Icirc;","&icirc;","&iexcl;","&Igrave;","&igrave;","&image;","&infin;","&int;","&Iota;","&iota;","&iquest;","&isin;","&Iuml;","&iuml;","&Kappa;","&kappa;","&Lambda;","&lambda;","&lang;","&laquo;","&lArr;","&larr;","&lceil;","&ldquo;","&le;","&lfloor;","&lowast;","&loz;","&lrm;","&lsaquo;","&lsquo;","&macr;","&mdash;","&micro;","&middot;","&minus;","&Mu;","&mu;","&nabla;","&nbsp;","&ndash;","&ne;","&ni;","&not;","&notin;","&nsub;","&Ntilde;","&ntilde;","&Nu;","&nu;","&Oacute;","&oacute;","&Ocirc;","&ocirc;","&OElig;","&oelig;","&Ograve;","&ograve;","&oline;","&Omega;","&omega;","&Omicron;","&omicron;","&oplus;","&or;","&ordf;","&ordm;","&Oslash;","&oslash;","&Otilde;","&otilde;","&otimes;","&Ouml;","&ouml;","&para;","&part;","&permil;","&perp;","&Phi;","&phi;","&Pi;","&pi;","&piv;","&plusmn;","&pound;","&Prime;","&prime;","&prod;","&prop;","&Psi;","&psi;","&radic;","&rang;","&raquo;","&rArr;","&rarr;","&rceil;","&rdquo;","&real;","&reg;","&rfloor;","&Rho;","&rho;","&rlm;","&rsaquo;","&rsquo;","&sbquo;","&Scaron;","&scaron;","&sdot;","&sect;","&shy;","&Sigma;","&sigma;","&sigmaf;","&sim;","&spades;","&sub;","&sube;","&sum;","&sup;","&sup1;","&sup2;","&sup3;","&supe;","&szlig;","&Tau;","&tau;","&there4;","&Theta;","&theta;","&thetasym;","&thinsp;","&THORN;","&thorn;","&tilde;","&times;","&trade;","&Uacute;","&uacute;","&uArr;","&uarr;","&Ucirc;","&ucirc;","&Ugrave;","&ugrave;","&uml;","&upsih;","&Upsilon;","&upsilon;","&Uuml;","&uuml;","&weierp;","&Xi;","&xi;","&Yacute;","&yacute;","&yen;","&Yuml;","&yuml;","&Zeta;","&zeta;");
+var UnicDec = new Array("&#194;","&#226;","&#180;","&#198;","&#230;","&#192;","&#224;","&#8501;","&#913;","&#945;","&#8743;","&#8736;","&#39;","&#197;","&#229;","&#8776;","&#195;","&#227;","&#196;","&#228;","&#8222;","&#914;","&#946;","&#166;","&#8226;","&#8745;","&#199;","&#231;","&#184;","&#162;","&#935;","&#967;","&#710;","&#9827;","&#8773;","&#169;","&#8629;","&#8746;","&#164;","&#8225;","&#8224;","&#8659;","&#8595;","&#176;","&#916;","&#948;","&#9830;","&#247;","&#201;","&#233;","&#202;","&#234;","&#200;","&#232;","&#8709;","&#8195;","&#8194;","&#917;","&#949;","&#8801;","&#919;","&#951;","&#208;","&#240;","&#203;","&#235;","&#8364;","&#8707;","&#402;","&#8704;","&#189;","&#188;","&#190;","&#8260;","&#915;","&#947;","&#8805;","&#8660;","&#8596;","&#9829;","&#8230;","&#205;","&#237;","&#206;","&#238;","&#161;","&#204;","&#236;","&#8465;","&#8734;","&#8747;","&#921;","&#953;","&#191;","&#8712;","&#207;","&#239;","&#922;","&#954;","&#923;","&#955;","&#9001;","&#171;","&#8656;","&#8592;","&#8968;","&#8220;","&#8804;","&#8970;","&#8727;","&#9674;","&#8206;","&#8249;","&#8216;","&#175;","&#8212;","&#181;","&#183;","&#8722;","&#924;","&#956;","&#8711;","&#160;","&#8211;","&#8800;","&#8715;","&#172;","&#8713;","&#8836;","&#209;","&#241;","&#925;","&#957;","&#211;","&#243;","&#212;","&#244;","&#338;","&#339;","&#210;","&#242;","&#8254;","&#937;","&#969;","&#927;","&#959;","&#8853;","&#8744;","&#170;","&#186;","&#216;","&#248;","&#213;","&#245;","&#8855;","&#214;","&#246;","&#182;","&#8706;","&#8240;","&#8869;","&#934;","&#966;","&#928;","&#960;","&#982;","&#177;","&#163;","&#8243;","&#8242;","&#8719;","&#8733;","&#936;","&#968;","&#8730;","&#9002;","&#187;","&#8658;","&#8594;","&#8969;","&#8221;","&#8476;","&#174;","&#8971;","&#929;","&#961;","&#8207;","&#8250;","&#8217;","&#8218;","&#352;","&#353;","&#8901;","&#167;","&#173;","&#931;","&#963;","&#962;","&#8764;","&#9824;","&#8834;","&#8838;","&#8721;","&#8835;","&#185;","&#178;","&#179;","&#8839;","&#223;","&#932;","&#964;","&#8756;","&#920;","&#952;","&#977;","&#8201;","&#222;","&#254;","&#732;","&#215;","&#8482;","&#218;","&#250;","&#8657;","&#8593;","&#219;","&#251;","&#217;","&#249;","&#168;","&#978;","&#933;","&#965;","&#220;","&#252;","&#8472;","&#926;","&#958;","&#221;","&#253;","&#165;","&#376;","&#255;","&#918;","&#950;");
+var UnicHex = new Array("&#x00C2;","&#x00E2;","&#x00B4;","&#x00C6;","&#x00E6;","&#x00C0;","&#x00E0;","&#x2135;","&#x0391;","&#x03B1;","&#x2227;","&#x2220;","&#x0027;","&#x00C5;","&#x00E5;","&#x2248;","&#x00C3;","&#x00E3;","&#x00C4;","&#x00E4;","&#x201E;","&#x0392;","&#x03B2;","&#x00A6;","&#x2022;","&#x2229;","&#x00C7;","&#x00E7;","&#x00B8;","&#x00A2;","&#x03A7;","&#x03C7;","&#x02C6;","&#x2663;","&#x2245;","&#x00A9;","&#x21B5;","&#x222A;","&#x00A4;","&#x2021;","&#x2020;","&#x21D3;","&#x2193;","&#x00B0;","&#x0394;","&#x03B4;","&#x2666;","&#x00F7;","&#x00C9;","&#x00E9;","&#x00CA;","&#x00EA;","&#x00C8;","&#x00E8;","&#x2205;","&#x2003;","&#x2002;","&#x0395;","&#x03B5;","&#x2261;","&#x0397;","&#x03B7;","&#x00D0;","&#x00F0;","&#x00CB;","&#x00EB;","&#x20AC;","&#x2203;","&#x0192;","&#x2200;","&#x00BD;","&#x00BC;","&#x00BE;","&#x2044;","&#x0393;","&#x03B3;","&#x2265;","&#x21D4;","&#x2194;","&#x2665;","&#x2026;","&#x00CD;","&#x00ED;","&#x00CE;","&#x00EE;","&#x00A1;","&#x00CC;","&#x00EC;","&#x2111;","&#x221E;","&#x222B;","&#x0399;","&#x03B9;","&#x00BF;","&#x2208;","&#x00CF;","&#x00EF;","&#x039A;","&#x03BA;","&#x039B;","&#x03BB;","&#x2329;","&#x00AB;","&#x21D0;","&#x2190;","&#x2308;","&#x201C;","&#x2264;","&#x230A;","&#x2217;","&#x25CA;","&#x200E;","&#x2039;","&#x2018;","&#x00AF;","&#x2014;","&#x00B5;","&#x00B7;","&#x2212;","&#x039C;","&#x03BC;","&#x2207;","&#x00A0;","&#x2013;","&#x2260;","&#x220B;","&#x00AC;","&#x2209;","&#x2284;","&#x00D1;","&#x00F1;","&#x039D;","&#x03BD;","&#x00D3;","&#x00F3;","&#x00D4;","&#x00F4;","&#x0152;","&#x0153;","&#x00D2;","&#x00F2;","&#x203E;","&#x03A9;","&#x03C9;","&#x039F;","&#x03BF;","&#x2295;","&#x2228;","&#x00AA;","&#x00BA;","&#x00D8;","&#x00F8;","&#x00D5;","&#x00F5;","&#x2297;","&#x00D6;","&#x00F6;","&#x00B6;","&#x2202;","&#x2030;","&#x22A5;","&#x03A6;","&#x03C6;","&#x03A0;","&#x03C0;","&#x03D6;","&#x00B1;","&#x00A3;","&#x2033;","&#x2032;","&#x220F;","&#x221D;","&#x03A8;","&#x03C8;","&#x221A;","&#x232A;","&#x00BB;","&#x21D2;","&#x2192;","&#x2309;","&#x201D;","&#x211C;","&#x00AE;","&#x230B;","&#x03A1;","&#x03C1;","&#x200F;","&#x203A;","&#x2019;","&#x201A;","&#x0160;","&#x0161;","&#x22C5;","&#x00A7;","&#x00AD;","&#x03A3;","&#x03C3;","&#x03C2;","&#x223C;","&#x2660;","&#x2282;","&#x2286;","&#x2211;","&#x2283;","&#x00B9;","&#x00B2;","&#x00B3;","&#x2287;","&#x00DF;","&#x03A4;","&#x03C4;","&#x2234;","&#x0398;","&#x03B8;","&#x03D1;","&#2009;","&#x00DE;","&#x00FE;","&#x02DC;","&#x00D7;","&#x2122;","&#x00DA;","&#x00FA;","&#x21D1;","&#x2191;","&#x00DB;","&#x00FB;","&#x00D9;","&#x00F9;","&#x00A8;","&#x03D2;","&#x03A5;","&#x03C5;","&#x00DC;","&#x00FC;","&#x2118;","&#x039E;","&#x03BE;","&#x00DD;","&#x00FD;","&#x00A5;","&#x0178;","&#x00FF;","&#x0396;","&#x03B6;");
+/* ISO-Supported
+ * var UTFChar[] = "\"","<",">","&"
+ * var HTMLent[] = "&quot;","&lt;","&gt;","&amp;"
+ * var UnicDec[] = "&#34;","&#60;","&#62;","&#38;"
+ * var UnicHex[] = "&#x0022;","&#x003C;","&#x003E;","&#x0026;"
+ *
+ * not ISO-Supported
+ * &zwj; 	Engl.: Zero Width Joiner 		&#8205; &#x200D; General Punctuation
+ * &zwnj;	Engl.: Zero Width Non-Joiner	&#8204;	&#x200C; General Punctuation
+ */
+
+/* 
+ * Map for Converting UTF-8 to ISO + HTML-Entities
+ */
+var emptyTags = new Array("meta","base","basefont","param","link","img","br","hr","area","input");
+
+function utf_convert (text,dir) {
+	for(var i = 0; i < UTFChar.length; i++) {
+		sString = "/" + UTFChar[i] + "/g";
+		sString = eval(sString);
+		text = text.replace(sString,HTMLent[i]);
+	}
+	return text;
+}
+
+function html2xhtml (text) {
+	for(var i = 0; i < emptyTags.length; i++) {
+		sString = "/<(" + emptyTags[i] + " )([^>]*)([^\/])>/g";
+		sString = eval(sString);
+		text = text.replace(sString,'<$1$2$3 />');
+	}
+	return text;
+}
+
+function cancelhtml() {
+	document.location.href=base;
+	return false;
+}
+
+function savehtml() {
+	var rfilename = '';
+
+	if(act == "#html") {
+		// erzwinge wechsel zu frameview
+		$("#tabs a[href='#wysiwyg']").click();
+	}
+	
+	$.blockUI('saving ...');
+
+	var data = $('#frameview').contents().find("html").html();
+	
+/* proof
+ *
+ * <a href="mailto:$%7BMailAdrFuerZusaetzlicheDokumenteMail%7D">
+ * remove br
+ * data = data.replace(/\<br\>/ig,'');
+ * trim whitespace
+ * data = data.replace(/^\s+|\s+$/g, "");
+ * Remove trailing blanks
+ * data = data.replace(/\\s+\n/g, "\n");
+ * escape
+ * data = encodeURIComponent(data);
+ */
+	
+	// delete everything till <body...
+	data = data.substring(data.indexOf("<body"));
+	
+	// remove inv.
+	data = data.replace(/\<span class=\"inv\"\>(\$\{.*\})\<\/span\>/ig,'$1');
+
+	// convert {}
+	data = data.replace(/\%7B/ig,"{");
+	data = data.replace(/\%7D/ig,"}");
+
+	// Remove duplicate end-of-lines
+	data = data.replace(/\n\n\n/g, "\n");
+
+	// remove generated html-breaks in tables
+	data = data.replace(/\<br\><\/td\>/ig,'</td>');
+
+	// convert html to xhtml
+	data = html2xhtml(data);
+
+	// add doctype and html
+	data = header + data + "\n<\/html>";
+		
+	// convert utf-8 chars to iso-chars or html-entities
+	data = utf_convert(data,"htmlentities");
+
+	rfilename = filename.replace(/#/, "");
+	rfilename = filepath+rfilename;
+
+
+	$.post(savecgi, submitdata = { fdata:data, fname:rfilename }, function(str) {
+		if(str) {
+			$.unblockUI();
+			alert('Fehler:\n'+str);
+		} else {
+			document.location.href=base;
+		}
+	}, "text");
+	return false;
+}
+
+
+$(document).ready(function() {
+	
+	$('#tabs > a').each(function() {
+		var $this = $(this);
+		var hash = $this.attr("href");
+		if(act=="") {
+			act=hash;
+			$this.addClass('disable');
+		} else {
+			$(hash).hide();
+			$this.removeClass('disable');
+		}
+		
+		$this.bind("click",function(e){
+			var $this = $(this);
+			var hash = $this.attr("href");	
+			
+			if(act!=hash) {
+			
+				$(act).hide();
+				$("#tabs a[href='"+act+"']").removeClass('disable');
+	
+				act=hash;
+				$(act).show();
+				$("#tabs a[href='"+act+"']").addClass('disable');
+	
+				switch (hash) {	
+					
+					case "#wysiwyg":
+					// WYSIWYG
+		
+					if (initarea == true) {
+						data = editAreaLoader.getValue('textarea_1');
+						$('#frameview').contents().find("body").html(data);
+					}
+		
+					break;
+					case "#html":
+					// Edit Source
+					
+					if(initarea == false) {
+								
+						// init editarea eample
+						
+						
+						editAreaLoader.init({
+							id : "textarea_1"		// textarea id
+							,syntax: "html"			// syntax to be uses for highgliting
+							,start_highlight: true	// to display with highlight mode on start-up
+							,language: "de"
+							,allow_resize: "no"
+							,allow_toggle: false
+							,font_size: "8"
+							,font_family: "Monaco,monospace"
+						});
+												
+						initarea = true;
+					}
+			
+					// Load Content into editor
+					var data = $('#frameview').contents().find("body").html();
+					editAreaLoader.setValue('textarea_1', data);
+					break;
+				}
+			}
+			return false;
+		});
+	});
+	
+	if(filename){
+
+		$('#dna').prepend(filepath+filename);
+		
+		var data;
+		$.blockUI('loading ...');
+		
+		/* Seite in iframe laden
+		 * Parameter:
+		 * p_edit	[true] Ausblenden von Platzhaltern
+		 * idz		[Zufallszahl] zur Vermeidung Caching
+		 */
+		frames['frameview'].location.href=filepath+filename+'?p_edit=true&idz='+parseInt( Math.random() * ( 1000000 ));
+		
+
+		// wait till document loaded
+		$('#frameview').load(function() {
+			document.getElementById("frameview").contentDocument.designMode="on";
+			$.ajax({
+				type: "GET",
+				url: filepath+filename,
+				cache: false,
+				dataType: "html",
+				async: false,
+				success: function(data){
+					header = data.substring(0, data.indexOf("<body"));
+				}
+			});				
+			$.unblockUI();
+		});
+	}
+});
+
+</script>
+
+<style type="text/css">
+	html, body {
+		height:100%;
+		margin: 0;
+		padding: 0;
+	}
+	
+	body {
+		background-color: #666;
+	}
+	
+	table {
+		width:100%;
+		height:100%;
+		border:none;
+		border-collapse:collapse;
+	}
+	table td {
+		padding:0;
+		white-space:nowrap; 
+	}
+	
+	#content,#content div {
+		height:100%;
+	}
+	
+	#footer {
+		height: 40px;
+		width:100%;
+		overflow:hidden;
+		background-color:#ece9d8;
+		border-top: 1px solid #888;
+		border-bottom: 1px solid #999;		
+		z-index:998;
+	}
+	
+	iframe, textarea {
+		width:100%;
+		height:100%;
+		border: none;
+		margin: 0px;
+		padding: 0px;
+		background-color:#fff;
+	}
+	
+
+	td {
+		font-family: arial, helvetica, sans-serif;
+		font-size: 14px;
+		line-height: 14px;	
+		color: #999;
+	}
+
+	a, span {
+		margin-left:16px;		
+		margin-right:16px;
+		text-decoration: none;
+		color: #999;
+	}
+	
+	a:hover {
+		color: #333;
+	}
+	
+	.disable {
+		color: #333;
+	}
+	
+	</style>
+
+
+</head>
+<body>
+
+<table>
+<tr>
+	<td id="content">
+		<div id="wysiwyg"><iframe id="frameview" name="frameview" src="about:blank" scrolling="auto" frameborder="no">Sorry, your browser does not support IFrames</iframe></div>
+		<div id="html"><textarea id="textarea_1" name="content"></textarea></div>
+	</td>
+</tr>
+<tr>
+	<td id="footer">
+	<table>
+	<tr>
+	<td id="tabs">
+		<a href="#wysiwyg">Ansicht bearbeiten</a> | <a href="#html">HTML bearbeiten</a>
+	</td>
+	<td align="right" nowrap>
+		<span class="disable" id="dna" style="font-size:10px;"></span><a href="#" onClick="cancelhtml();">Cancel</a> | <a href="#"  onClick="savehtml();">Save</a>
+	</td>
+	</tr>
+	</table>
+	</td>
+</tr>
+</table>
+</body>
+</html>

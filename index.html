@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+
+<title>fEdit</title>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/fEdit_config.js"></script>
+
+<style type="text/css">
+body {
+	font-family:Helvetica,Arial,sans-serif;
+	font-size: 12px;
+	line-height: 16px;
+	color: #333;
+	margin-left: 2em;
+}
+
+pre {
+	color: #339;
+	margin-left: 2em;
+}
+
+h1 {
+	font-size: 16px;
+	padding-top: 1em;
+	border-top: 1px solid #333;
+}
+
+h2 {
+	font-size: 12px;
+	padding-top: 1em;
+}
+
+
+#index {
+	background-color: #eee;
+	padding: 1em;
+}
+
+#index pre {
+	margin-left:0;
+}
+
+#content {
+	width:600px;
+}
+</style>
+
+</head>
+<body>
+<div id="content">
+
+	<h1>fEdit v 0.1</h1>
+	<h1>HTML-Datei bearbeiten</h1>
+	<p>W&auml;hlen Sie eine HTML-Datei aus:</p>
+
+	<div id="index">
+		<h1>Ausgabe des Dateiverzeichnisses nicht möglich.</h1>
+		<p>Zur Ansicht des Verzeichnisses passen Sie bitte die .htaccess-Datei wie folgt an:</p>
+		<pre>Options +Indexes</pre>
+
+		<p>Alternativ können Sie die Datei auch direkt auswählen:</p>
+		<h1>Datei laden</h1>
+		<p>Geben Sie den Dateinamen der HTML-Seite an, welche Sie bearbeiten möchten:</p>
+		<form method="get" action="fEdit.html">
+			<p>Datei-Name: <input type="text" name="filename" value="" /> <input type="submit" value="Datei laden ..."/></p>
+		</form>
+	</div>
+	<h1>Hinweise zur Bearbeitung</h1>
+	<p>Tastaturbefehle im Ansichts-Modus:</p>
+	<ul>
+	<li>Bold: Cmd-b</li>
+	<li>Italic: Cmd-i</li>
+	<li>Copy: Cmd-c</li>
+	<li>Paste: Cmd-p</li>
+	<li>Undo: Cmd-z</li>
+	<li>Redo: Cmd-y</li>
+	</ul>
+	<p>Eine Zeilenschaltung setzt immer ein logisch folgendes Block-Element (&lt;p&gt;, &lt;li&gt; etc.). 
+	Soft-Breaks (&lt;br&gt;) müssen im HTML-Modus gesetzt werden.</p>
+
+	<h1>HTML-Datei in "fEdit.html" laden</h1>
+	<p>Durch Angabe des Dateinamens in der URL bei Aufruf des Editors &quot;fEdit.html&quot; wird die Datei sofort angezeigt und editierbar:</p>
+	<pre>fEdit.html?filename=Filename.html</pre>
+
+	<h1>Konfiguration</h1>
+
+	<p>Anpassungen werden in der Datei "js/fEdit_config.js" vorgenommen.</p>
+	<h2>Root-Verzeichnis der zu bearbeitenden Dateien (optional):</h2>
+	<pre>filepath = '/forms/'</pre>
+	<pre>filepath = '/index.html' [Angabe einer speziellen Datei]</pre>
+
+	<h2>Script, an welches der POST-Request gesendet werden soll ('save'):</h2>
+	<pre>savecgi = 'savedata.php'</pre>
+	
+	<h2>Post-Variablen, die an das Script gesendet werden:</h2>
+	<pre>fdata = [string] HTML-Markup, UTF-8 kompatible Zeichen und HTML-Entities</pre>
+	<pre>fname = [string] Filename</pre>
+
+	<h1>Speichern-Funktion (Script, welches in 'savecgi' angegeben wurde)</h1>
+	<p>Das in PHP geschriebene Beispielscript verfährt wie folgt:</p>
+	<ul>
+	<li>Post-Variablen 'fdata' und 'fname' entgegen nehmen</li>
+	<li>Slashes aus 'fdata' entfernen</li>
+	<li>Kopie der Datei 'fname' im Verzeichnis 'backup' nach dem Schema filename_datumuhrzeit.mime erstellen</li>
+	<li>Inhalt von 'fdata' in 'fname' schreiben</li>
+	</ul>
+	<p>Wird Text ausgegeben, wird dieser in auf der Seite 'fEdit.html' in einer altert-Box ausgegeben und man gelangt wieder zum Editor.</p>
+	<p>Wird kein Text ausgegeben, wird 'fEdit.html' geschlossen und die index-Datei aufgerufen.</p>
+	
+	<h1>Getestete Browser</h1>
+	<ul>
+	<li>Firefox 2.1 (Mac)</li>
+	<li>Safari 3 (Mac)</li>
+	</ul>
+<!--
+	<h2>Known Bugs</h2>
+	<ul>
+	<li>Nach inplace-editing wird dem parent-element das Attribut <pre>style=""</pre> zugewiesen.</li>
+	<li>Firefox (Max): Beim wiederholten Aufruf des HTML-Editors bricht das JavaScript mit einer Fehlermeldung ab.</li>
+	</ul>
+-->
+	<p style="padding-top:3em;"><em>© 2011 Pascal Orth</em></p>
+
+
+</div>
+<script language="javascript" type="text/javascript">
+	var fnam = '';
+	var arr = new Array();
+
+	if(filepath.match(/\/$/)) {
+		$.get(filepath, function(data){
+			$("#index").html(data);		
+			$("#index a").attr("href", function () {
+				var str = this.href;
+				if (str){
+					arr = str.match(/(.*)[\/\\]([^\/\\]+\.\w+)$/);
+					if(arr){
+						fnam ="fEdit.html?filename="+arr[2];
+					} else {
+						fnam="#";
+					}
+					$(this).attr("href", fnam);
+				}
+			});
+		});
+	} else {
+		arr = filepath.match(/(.*)[\/\\]([^\/\\]+\.\w+)$/);
+		if(arr) {
+			$("#index").html("<a href='fEdit.html?filename="+arr[2]+"'>"+filepath+"<\a>");
+		} else {
+			$("#index").html("<p>nicht gültig: "+filepath+"<\p>");
+		}
+	}
+	
+</script>
+</body>
+</html>
